@@ -24,9 +24,6 @@ Window {
     Component {
         id: reducerform
         ReducerForm {
-            progressBar.value: .2
-            percentText.text: "20%"
-
             MouseArea {
                 anchors.fill: parent
                 onClicked: {

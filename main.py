@@ -6,7 +6,7 @@ from PySide2.QtCore import QUrl
 from PySide2.QtGui import QGuiApplication
 
 from utilities import get_current_dir
-# from controller import CalculatorController
+from controller import PDFController
 
 current_dir = get_current_dir()
 
@@ -21,8 +21,9 @@ engine = QQmlApplicationEngine()
 import_path = os.path.join(current_dir, "view", "imports")
 engine.addImportPath(import_path)
 
-#  controller = CalculatorController()
-#  view.rootContext().setContextProperty("controller", controller)
+controller = PDFController()
+context = engine.rootContext()
+context.setContextProperty("controller", controller)
 
 filename = os.path.join(current_dir, "view", "Main.qml")
 url = QUrl(filename)

@@ -7,8 +7,6 @@ Rectangle {
     width: Constants.width
     height: Constants.height
     color: Constants.backgroundColor
-    property alias percentText: percentText
-    property alias progressBar: progressBar
 
     Text {
         id: headerText
@@ -28,9 +26,10 @@ Rectangle {
     Image {
         id: largePDFImage
         x: 126
-        y: 161
+        y: 155
         width: 147
         height: 124
+        sourceSize.width: 147
         source: "images/fa-file-pdf-o.svg"
         fillMode: Image.PreserveAspectFit
     }
@@ -38,7 +37,7 @@ Rectangle {
     Image {
         id: arrowImage
         x: 378
-        y: 186
+        y: 180
         width: 89
         height: 75
         fillMode: Image.PreserveAspectFit
@@ -48,7 +47,7 @@ Rectangle {
     Image {
         id: smallPDFImage
         x: 292
-        y: 198
+        y: 192
         width: 58
         height: 50
         sourceSize.height: 50
@@ -56,31 +55,6 @@ Rectangle {
         verticalAlignment: Image.AlignVCenter
         fillMode: Image.PreserveAspectFit
         source: "images/fa-arrow-right.svg"
-    }
-
-    ProgressBar {
-        id: progressBar
-        x: 126
-        y: 324
-        width: 389
-        height: 8
-        spacing: 0
-        font.pointSize: 15
-        value: 0
-    }
-
-    Text {
-        id: percentText
-        x: 237
-        y: 357
-        width: 168
-        height: 30
-        color: Constants.bodyText
-        text: qsTr("75%")
-        font.bold: true
-        font.pixelSize: 35
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
     }
 
     Text {
@@ -94,6 +68,14 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 25
+    }
+
+    BusyIndicator {
+        id: busyIndicator
+        x: 283
+        y: 303
+        width: 75
+        height: 71
     }
 }
 

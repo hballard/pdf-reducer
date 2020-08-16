@@ -21,6 +21,8 @@ Rectangle {
         y: 234
         width: 186
         height: 185
+        sourceSize.height: 186
+        sourceSize.width: 186
         source: "images/fa-file-pdf-o.svg"
         fillMode: Image.PreserveAspectFit
     }
@@ -69,7 +71,7 @@ Rectangle {
 
         RadioButton {
             id: radioButton330
-            text: "HD (330 PPI)"
+            text: qsTr("HD (330 PPI)")
             checked: true
             font.pointSize: 18
         }
