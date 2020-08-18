@@ -3,15 +3,14 @@ import shutil
 import subprocess
 
 from enum import Enum
-from typing import Optional
+from PySide2.QtCore import QObject, Slot
 from tempfile import gettempdir
-from PySide2.QtCore import Property, QObject, Signal, Slot
+from typing import Optional, Tuple
 
 from utilities import get_current_dir
 
 
 class CompressionQuality(Enum):
-    DEFAULT = "/default"
     PREPRESS = "/prepress"
     PRINTER = "/printer"
     EBOOK = "/ebook"
@@ -19,28 +18,39 @@ class CompressionQuality(Enum):
 
 
 class PDFController(QObject):
-    error_message: Optional[str]
     temp_output_file_path: Optional[str]
-    output_message: Optional[str]
 
     def __init__(self):
         super().__init__()
 
     @staticmethod
-    def is_pdf_file(input_file_path) -> bool:
+    def is_pdf_file(input_file_path: str) -> bool:
         return input_file_path.split(".")[-1].lower() == "pdf"
 
+    @staticmethod
+    def parse_compression_quality(quality_arg: str) -> CompressionQuality:
+        quality_arg_dict = {
+            "HD (300 PPI)": CompressionQuality.PREPRESS,
+            "Print (300 PPI)": CompressionQuality.PRINTER,
+            "Presentation (150 PPI)": CompressionQuality.EBOOK,
+            "Email (72 PPI)": CompressionQuality.SCREEN,
+        }
+        return quality_arg_dict[quality_arg]
+
+    @Slot(str, str, result="QVariantList")
     def compress_file(
-        self, input_file_path, quality=CompressionQuality.PRINTER
-    ) -> None:
+        self, input_file_path: str, quality: str
+    ) -> Tuple[str, str]:
 
         if not self.is_pdf_file(input_file_path):
-            self.error_message = "Error: input file is not a PDF"
-            return
+            error_message = "Error: input file is not a PDF"
+            return ("error", error_message)
+
+        compression_quality = self.parse_compression_quality(quality)
 
         binary_path = os.path.join(get_current_dir(), "lib", "gs")
 
-        initial_size = os.path.getsize(input_file_path)
+        input_file_path = input_file_path.replace("file://", "")
 
         self.temp_output_file_path = os.path.join(
             gettempdir(), os.path.basename(input_file_path)
@@ -51,7 +61,7 @@ class PDFController(QObject):
                 f"{binary_path}",
                 "-sDEVICE=pdfwrite",
                 "-dCompatibilityLevel=1.4",
-                f"-dPDFSETTINGS={quality}",
+                f"-dPDFSETTINGS={compression_quality.value}",
                 "-dNOPAUSE",
                 "-dQUIET",
                 "-dBATCH",
@@ -60,22 +70,29 @@ class PDFController(QObject):
             ]
         )
 
+        initial_size = os.path.getsize(input_file_path)
         final_size = os.path.getsize(self.temp_output_file_path)
-        ratio = 1 - (final_size / initial_size)
-        self.output_message = (
-            f"File reduced from {(initial_size / 1000000):.1f}MB"
-            f"to {(final_size / 1000000):.1f}MB ({ratio:.0%})"
+        percent_reduction = (initial_size - final_size) / initial_size
+        output_message = (
+            f"File reduced from {(initial_size / 1000000):.4f}MB"
+            f" to {(final_size / 1000000):.4f}MB ({percent_reduction:.1%})"
         )
 
-    def copy_file(self, output_file_path) -> None:
+        return ("result", output_message)
+
+    @Slot(str)
+    def copy_file(self, output_file_path: str) -> None:
+        output_file_path = output_file_path.replace("file://", "")
         try:
             if self.temp_output_file_path:
+                new_base_file_path = os.path.basename(
+                    self.temp_output_file_path
+                ).split(".")[0]
+                new_output_file_path = os.path.join(
+                    output_file_path, f"{new_base_file_path}-compressed.pdf"
+                )
                 shutil.copyfile(
-                    self.temp_output_file_path,
-                    os.path.join(
-                        output_file_path,
-                        os.path.basename(self.temp_output_file_path),
-                    ),
+                    self.temp_output_file_path, new_output_file_path
                 )
         except OSError as e:
             self.error_message = str(e)

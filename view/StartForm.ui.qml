@@ -71,26 +71,26 @@ Rectangle {
 
         RadioButton {
             id: radioButton330
-            text: qsTr("HD (330 PPI)")
+            text: qsTr("HD (300 PPI)")
             checked: true
             font.pointSize: 18
         }
 
         RadioButton {
             id: radioButton225
-            text: qsTr("Print (225 PPI)")
+            text: qsTr("Print (300 PPI)")
             font.pointSize: 18
         }
 
         RadioButton {
             id: radioButton150
-            text: qsTr("On-Screen (150 PPI)")
+            text: qsTr("Presentation (150 PPI)")
             font.pointSize: 18
         }
 
         RadioButton {
             id: radioButton96
-            text: qsTr("Email (96 PPI)")
+            text: qsTr("Email (72 PPI)")
             font.pointSize: 18
         }
     }

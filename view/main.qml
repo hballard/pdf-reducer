@@ -9,13 +9,15 @@ Window {
     minimumWidth: Constants.width
     maximumWidth: Constants.width
     visible: true
+    property string inputFile
+    property string quality
 
     Component {
         id: startform
         StartForm {
             dropArea.onDropped: function (drop) {
-                console.log(drop.text)
-                console.log(radioGroup.checkedButton.text)
+                inputFile = drop.text
+                quality = radioGroup.checkedButton.text
                 loader.sourceComponent = reducerform
             }
         }
@@ -24,11 +26,9 @@ Window {
     Component {
         id: reducerform
         ReducerForm {
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    loader.sourceComponent = saveform
-                }
+            Component.onCompleted: function () {
+                let result = controller.compress_file(inputFile, quality)
+                console.log(result)
             }
         }
     }
@@ -41,7 +41,7 @@ Window {
             }
 
             fileDialog.onAccepted: function () {
-                console.log(fileDialog.folder)
+                controller.copy_file(fileDialog.folder)
                 loader.sourceComponent = startform
             }
         }
