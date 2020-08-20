@@ -11,6 +11,8 @@ Window {
     visible: true
     property string inputFile
     property string quality
+    property string resultMessage
+    property bool buttonDisplay
 
     Component {
         id: startform
@@ -26,9 +28,22 @@ Window {
     Component {
         id: reducerform
         ReducerForm {
-            Component.onCompleted: function () {
-                let result = controller.compress_file(inputFile, quality)
-                console.log(result)
+
+            Component.onCompleted: {
+                controller.compress_file(inputFile, quality)
+            }
+
+            Connections {
+                target: controller
+                function onCompressionResult(result) {
+                    resultMessage = result[1]
+                    if (result[0] === 'error') {
+                        buttonDisplay = false
+                    } else {
+                        buttonDisplay = true
+                    }
+                    loader.sourceComponent = saveform
+                }
             }
         }
     }
@@ -36,6 +51,9 @@ Window {
     Component {
         id: saveform
         SaveForm {
+            saveButton.visible: buttonDisplay
+            outputText.text: resultMessage
+
             saveButton.onClicked: function () {
                 fileDialog.open()
             }

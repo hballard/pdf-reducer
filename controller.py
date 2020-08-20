@@ -3,9 +3,10 @@ import shutil
 import subprocess
 
 from enum import Enum
-from PySide2.QtCore import QObject, Slot
+from functools import partial
+from PySide2.QtCore import QObject, Slot, QThread, Signal
 from tempfile import gettempdir
-from typing import Optional, Tuple
+from typing import Optional
 
 from utilities import get_current_dir
 
@@ -17,11 +18,8 @@ class CompressionQuality(Enum):
     SCREEN = "/screen"
 
 
-class PDFController(QObject):
-    temp_output_file_path: Optional[str]
-
-    def __init__(self):
-        super().__init__()
+class Worker(QObject):
+    result = Signal("QVariantList")
 
     @staticmethod
     def is_pdf_file(input_file_path: str) -> bool:
@@ -37,24 +35,19 @@ class PDFController(QObject):
         }
         return quality_arg_dict[quality_arg]
 
-    @Slot(str, str, result="QVariantList")
+    @Slot(str, str, str)
     def compress_file(
-        self, input_file_path: str, quality: str
-    ) -> Tuple[str, str]:
+        self, input_file_path: str, temp_output_file_path: str, quality: str
+    ) -> None:
 
         if not self.is_pdf_file(input_file_path):
             error_message = "Error: input file is not a PDF"
-            return ("error", error_message)
+            self.result.emit(("error", error_message))
+            return
 
         compression_quality = self.parse_compression_quality(quality)
 
         binary_path = os.path.join(get_current_dir(), "lib", "gs")
-
-        input_file_path = input_file_path.replace("file://", "")
-
-        self.temp_output_file_path = os.path.join(
-            gettempdir(), os.path.basename(input_file_path)
-        )
 
         subprocess.run(
             [
@@ -65,20 +58,54 @@ class PDFController(QObject):
                 "-dNOPAUSE",
                 "-dQUIET",
                 "-dBATCH",
-                f"-sOutputFile={self.temp_output_file_path}",
+                f"-sOutputFile={temp_output_file_path}",
                 input_file_path,
             ]
         )
 
         initial_size = os.path.getsize(input_file_path)
-        final_size = os.path.getsize(self.temp_output_file_path)
+        final_size = os.path.getsize(temp_output_file_path)
         percent_reduction = (initial_size - final_size) / initial_size
         output_message = (
             f"File reduced from {(initial_size / 1000000):.4f}MB"
             f" to {(final_size / 1000000):.4f}MB ({percent_reduction:.1%})"
         )
 
-        return ("result", output_message)
+        self.result.emit(("result", output_message))
+
+
+class PDFController(QObject):
+    compressionResult = Signal("QVariantList")
+    temp_output_file_path: Optional[str]
+
+    def __init__(self):
+        super().__init__()
+
+    @Slot(str, str)
+    def compress_file(self, input_file_path: str, quality: str) -> None:
+
+        input_file_path = input_file_path.replace("file://", "")
+
+        self.temp_output_file_path = os.path.join(
+            gettempdir(), os.path.basename(input_file_path)
+        )
+
+        self.thread = QThread()
+        worker = Worker()
+        worker.moveToThread(self.thread)
+        worker.result.connect(self.compressionResult)
+
+        worker_func = partial(
+            worker.compress_file,
+            input_file_path,
+            self.temp_output_file_path,
+            quality,
+        )
+        self.thread.started.connect(worker_func)
+        self.thread.finished.connect(self.thread.quit)
+
+        self.thread.start()
+
 
     @Slot(str)
     def copy_file(self, output_file_path: str) -> None:
