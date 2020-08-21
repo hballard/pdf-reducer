@@ -20,6 +20,7 @@ class CompressionQuality(Enum):
 
 class Worker(QObject):
     result = Signal("QVariantList")
+    finished = Signal()
 
     @staticmethod
     def is_pdf_file(input_file_path: str) -> bool:
@@ -72,6 +73,7 @@ class Worker(QObject):
         )
 
         self.result.emit(("result", output_message))
+        self.finished.emit()
 
 
 class PDFController(QObject):
@@ -94,6 +96,7 @@ class PDFController(QObject):
         worker = Worker()
         worker.moveToThread(self.thread)
         worker.result.connect(self.compressionResult)
+        worker.finished.connect(self.thread.quit)
 
         worker_func = partial(
             worker.compress_file,
@@ -102,7 +105,6 @@ class PDFController(QObject):
             quality,
         )
         self.thread.started.connect(worker_func)
-        self.thread.finished.connect(self.thread.quit)
 
         self.thread.start()
 
