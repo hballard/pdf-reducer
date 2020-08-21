@@ -12,7 +12,8 @@ Window {
     property string inputFile
     property string quality
     property string resultMessage
-    property bool buttonDisplay
+    property bool saveButtonVisibility
+    property bool cancelButtonVisibility
 
     Component {
         id: startform
@@ -38,9 +39,8 @@ Window {
                 function onCompressionResult(result) {
                     resultMessage = result[1]
                     if (result[0] === 'error') {
-                        buttonDisplay = false
-                    } else {
-                        buttonDisplay = true
+                        saveButtonVisibility = false
+                        cancelButtonVisibility = true
                     }
                     loader.sourceComponent = saveform
                 }
@@ -51,16 +51,29 @@ Window {
     Component {
         id: saveform
         SaveForm {
-            saveButton.visible: buttonDisplay
+            saveButton.visible: saveButtonVisibility
+            cancelButton.visible: cancelButtonVisibility
             outputText.text: resultMessage
 
             saveButton.onClicked: function () {
                 fileDialog.open()
             }
 
-            fileDialog.onAccepted: function () {
-                controller.copy_file(fileDialog.folder)
+            cancelButton.onClicked: function () {
                 loader.sourceComponent = startform
+                cancelButtonVisibility = false
+                saveButtonVisibility = true
+            }
+
+            fileDialog.onAccepted: function () {
+                var result = controller.copy_file(fileDialog.folder)
+                if (result[0] === 'error') {
+                    saveButtonVisibility = false
+                    cancelButtonVisibility = true
+                    resultMessage = result[1]
+                } else {
+                    loader.sourceComponent = startform
+                }
             }
         }
     }
@@ -70,10 +83,3 @@ Window {
         sourceComponent: startform
     }
 }
-
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
-##^##*/
-

@@ -8,6 +8,7 @@ Rectangle {
     width: Constants.width
     height: Constants.height
     color: Constants.backgroundColor
+    property alias cancelButton: cancelButton
     property alias outputText: outputText
     property alias saveButton: saveButton
     property alias fileDialog: fileDialog
@@ -39,11 +40,16 @@ Rectangle {
 
     Text {
         id: outputText
-        x: 124
-        y: 321
+        x: 70
+        y: 313
+        width: 500
+        height: 58
         color: "#ffffff"
-        text: qsTr("File reduced from 10MB to 2MB (80%)")
-        fontSizeMode: Text.FixedSize
+        text: "File reduced from 10MB to 2MB (80%)"
+        elide: Text.ElideRight
+        verticalAlignment: Text.AlignVCenter
+        maximumLineCount: 2
+        wrapMode: Text.WordWrap
         horizontalAlignment: Text.AlignHCenter
         font.pixelSize: 23
     }
@@ -51,10 +57,24 @@ Rectangle {
     Button {
         id: saveButton
         x: 264
-        y: 380
+        y: 389
         width: 113
         height: 43
         text: qsTr("Save")
+        visible: true
+        highlighted: true
+        font.pointSize: 18
+        font.bold: true
+    }
+
+    Button {
+        id: cancelButton
+        x: 264
+        y: 389
+        width: 113
+        height: 43
+        text: qsTr("Try Again")
+        visible: false
         highlighted: true
         font.pointSize: 18
         font.bold: true
