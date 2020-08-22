@@ -12,8 +12,8 @@ Window {
     property string inputFile
     property string quality
     property string resultMessage
-    property bool saveButtonVisibility
-    property bool cancelButtonVisibility
+    property bool saveButtonVisibility: true
+    property bool cancelButtonVisibility: false
 
     Component {
         id: startform

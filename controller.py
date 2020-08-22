@@ -57,6 +57,9 @@ class PDFController(QObject):
         self.process = QProcess()
         self.process.start(program, arguments)
         self.process.finished.connect(self.send_result)
+        self.process.errorOccurred.connect(
+            lambda error: self.compressionResult.emit(("error", str(error)))
+        )
 
     def send_result(self) -> None:
         initial_size = os.path.getsize(self.input_file_path)
