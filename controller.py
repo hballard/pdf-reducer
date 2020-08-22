@@ -9,11 +9,18 @@ from typing import Optional, Tuple
 from utilities import get_current_dir
 
 
-class CompressionQuality(Enum):
+class GSQualitySetting(Enum):
     PREPRESS = "/prepress"
     PRINTER = "/printer"
     EBOOK = "/ebook"
     SCREEN = "/screen"
+
+
+class InputQualitySetting(Enum):
+    PREPRESS = "HD (300 PPI)"
+    PRINTER = "Print (300 PPI)"
+    EBOOK = "Presentation (150 PPI)"
+    SCREEN = "Email (72 PPI)"
 
 
 class PDFController(QObject):
@@ -91,14 +98,16 @@ class PDFController(QObject):
             return ("error", str(e))
 
     @staticmethod
-    def parse_compression_quality(quality_arg: str) -> CompressionQuality:
+    def parse_compression_quality(quality_arg: str) -> GSQualitySetting:
         quality_arg_dict = {
-            "HD (300 PPI)": CompressionQuality.PREPRESS,
-            "Print (300 PPI)": CompressionQuality.PRINTER,
-            "Presentation (150 PPI)": CompressionQuality.EBOOK,
-            "Email (72 PPI)": CompressionQuality.SCREEN,
+            InputQualitySetting.PREPRESS.value: GSQualitySetting.PREPRESS,
+            InputQualitySetting.PRINTER.value: GSQualitySetting.PRINTER,
+            InputQualitySetting.EBOOK.value: GSQualitySetting.EBOOK,
+            InputQualitySetting.SCREEN.value: GSQualitySetting.SCREEN,
         }
         return quality_arg_dict[quality_arg]
 
     def is_pdf_file(self) -> bool:
-        return self.input_file_path.split(".")[-1].lower() == "pdf"
+        if self.input_file_path:
+            return self.input_file_path.split(".")[-1].lower() == "pdf"
+        return False
