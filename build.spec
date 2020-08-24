@@ -1,15 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
-
-# TODO: Exclude tkinter from final bundle
-
 import os
 
 
 block_cipher = None
 
-added_files = [("view", "view")]
-
-added_bineries = [("lib", "lib")]
+added_files = [
+    ("view", "view"),
+    ("/usr/local/bin/gs", "lib"),
+    (
+        "/Users/heath/.local/share/virtualenvs/pdf-reducer-rdogquAt/lib/python3.8/site-packages/shiboken2",
+        "shiboken2",
+    ),
+]
 
 excluded_binaries = [
     "QtWebEngineCore",
@@ -38,9 +40,9 @@ excluded_binaries = [
     "QtPurchasing",
     "QtQuick3DUtils",
     "QtMultimedia",
-    "QtQuickTemplates2",
+    #  "QtQuickTemplates2",
     "QtQuickParticles",
-    "QtScxml"
+    "QtScxml",
 ]
 
 a = Analysis(
@@ -51,7 +53,7 @@ a = Analysis(
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],
-    excludes=[],
+    excludes=['FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter'],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
@@ -67,7 +69,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="Heath's PDF Reducer",
+    name="PDF Reducer",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -82,11 +84,11 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="Heath's PDF Reducer",
+    name="PDF Reducer",
 )
 app = BUNDLE(
     coll,
-    name="Heath's PDF Reducer",
+    name="PDF Reducer.app",
     info_plist={"NSHighResolutionCapable": "True"},
     icon=os.path.join("images", "program_icon.icns"),
     bundle_identifier=None,
