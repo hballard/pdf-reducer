@@ -14,6 +14,7 @@ Window {
     property string resultMessage
     property bool saveButtonVisibility: true
     property bool cancelButtonVisibility: false
+    property bool backArrowVisibility: true
 
     Component {
         id: startform
@@ -40,6 +41,7 @@ Window {
                     resultMessage = result[1]
                     if (result[0] === 'error') {
                         saveButtonVisibility = false
+                        backArrowVisibility = false
                         cancelButtonVisibility = true
                     }
                     loader.sourceComponent = saveform
@@ -53,7 +55,15 @@ Window {
         SaveForm {
             saveButton.visible: saveButtonVisibility
             cancelButton.visible: cancelButtonVisibility
+            backArrow.visible: backArrowVisibility
             outputText.text: resultMessage
+
+            backArrowMouseArea.onClicked: function () {
+                loader.sourceComponent = startform
+                cancelButtonVisibility = false
+                saveButtonVisibility = true
+                backArrowVisibility = true
+            }
 
             saveButton.onClicked: function () {
                 fileDialog.open()
@@ -63,12 +73,14 @@ Window {
                 loader.sourceComponent = startform
                 cancelButtonVisibility = false
                 saveButtonVisibility = true
+                backArrowVisibility = true
             }
 
             fileDialog.onAccepted: function () {
                 var result = controller.copy_file(fileDialog.folder)
                 if (result[0] === 'error') {
                     saveButtonVisibility = false
+                    backArrowVisibility = false
                     cancelButtonVisibility = true
                     resultMessage = result[1]
                 } else {
@@ -83,3 +95,10 @@ Window {
         sourceComponent: startform
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/
+

@@ -43,7 +43,8 @@ class PDFController(QObject):
 
         compression_quality = self.parse_compression_quality(quality)
 
-        binary_path = os.path.join(get_current_dir(), "lib", "gs")
+        binary_path = os.path.join(get_current_dir(), "vendor", "ghostscript",
+                                   "bin", "gs")
 
         self.temp_output_file_path = os.path.join(
             gettempdir(), os.path.basename(self.input_file_path)

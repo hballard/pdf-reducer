@@ -38,7 +38,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         fontSizeMode: Text.Fit
         horizontalAlignment: Text.AlignHCenter
-        font.family: "Franklin Gothic"
+        font.family: Constants.headerFont.name
         font.pixelSize: 73
     }
 

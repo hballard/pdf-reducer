@@ -8,6 +8,8 @@ Rectangle {
     width: Constants.width
     height: Constants.height
     color: Constants.backgroundColor
+    property alias backArrowMouseArea: mousearea
+    property alias backArrow: backArrow
     property alias cancelButton: cancelButton
     property alias outputText: outputText
     property alias saveButton: saveButton
@@ -24,7 +26,7 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         fontSizeMode: Text.Fit
         horizontalAlignment: Text.AlignHCenter
-        font.family: "Franklin Gothic"
+        font.family: Constants.headerFont.name
         font.pixelSize: 73
     }
 
@@ -86,5 +88,22 @@ Rectangle {
         folder: shortcuts.home
         selectExisting: false
         selectFolder: true
+    }
+
+    Image {
+        id: backArrow
+        x: 15
+        y: 15
+        width: 55
+        height: 41
+        sourceSize.height: 41
+        sourceSize.width: 55
+        source: "images/back-arrow.svg"
+        fillMode: Image.PreserveAspectFit
+
+        MouseArea {
+            id: mousearea
+            anchors.fill: parent
+        }
     }
 }
