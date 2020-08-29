@@ -6,7 +6,7 @@ block_cipher = None
 
 added_files = [
     ("view", "view"),
-    ("/usr/local/Cellar/ghostscript/9.52/bin/gs", "vendor/ghostscript/bin"),
+    ("/usr/local/Cellar/ghostscript/9.52/bin", "vendor/ghostscript/bin"),
     ("/usr/local/Cellar/ghostscript/9.52/lib", "vendor/ghostscript/lib")
 ]
 
@@ -57,7 +57,8 @@ a = Analysis(
     hiddenimports=[],
     hookspath=[],
     runtime_hooks=[],
-    excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
+    #  excludes=["FixTk", "tcl", "tk", "_tkinter", "tkinter", "Tkinter"],
+    excludes=[],
     win_no_prefer_redirects=False,
     win_private_assemblies=False,
     cipher=block_cipher,
