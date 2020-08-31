@@ -1,12 +1,12 @@
 import os
 import sys
 
-from PySide2.QtQml import QQmlApplicationEngine
 from PySide2.QtCore import QUrl
 from PySide2.QtGui import QGuiApplication
+from PySide2.QtQml import QQmlApplicationEngine
 
-from utilities import get_current_dir
 from controller import PDFController
+from utilities import get_current_dir
 
 current_dir = get_current_dir()
 

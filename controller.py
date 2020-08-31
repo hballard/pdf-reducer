@@ -1,10 +1,10 @@
 import os
 import shutil
-
 from enum import Enum
-from PySide2.QtCore import QObject, Slot, Signal, QProcess
 from tempfile import gettempdir
 from typing import Optional, Tuple
+
+from PySide2.QtCore import QObject, QProcess, Signal, Slot
 
 from utilities import get_current_dir
 
@@ -43,8 +43,9 @@ class PDFController(QObject):
 
         compression_quality = self.parse_compression_quality(quality)
 
-        binary_path = os.path.join(get_current_dir(), "vendor", "ghostscript",
-                                   "bin", "gs")
+        binary_path = os.path.join(
+            get_current_dir(), "vendor", "ghostscript", "bin", "gs"
+        )
 
         self.temp_output_file_path = os.path.join(
             gettempdir(), os.path.basename(self.input_file_path)
@@ -85,15 +86,13 @@ class PDFController(QObject):
         output_file_path = output_file_path.replace("file://", "")
         try:
             if self.temp_output_file_path:
-                new_base_file_path = os.path.basename(
-                    self.temp_output_file_path
-                ).split(".")[0]
+                new_base_file_path = os.path.basename(self.temp_output_file_path).split(
+                    "."
+                )[0]
                 new_output_file_path = os.path.join(
                     output_file_path, f"{new_base_file_path}-compressed.pdf"
                 )
-                shutil.copyfile(
-                    self.temp_output_file_path, new_output_file_path
-                )
+                shutil.copyfile(self.temp_output_file_path, new_output_file_path)
                 return ("result", "")
         except OSError as e:
             return ("error", str(e))
